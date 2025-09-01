@@ -1,5 +1,5 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "2.1.20"
+    id("org.jetbrains.kotlin.jvm") version "1.9.25"
     `maven-publish`
     signing
 }
@@ -16,7 +16,6 @@ dependencies {
     // Kotlin standard library
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
     
-    
     // Optional: Reflection for advanced widget inspection
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     
@@ -28,7 +27,13 @@ dependencies {
 }
 
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain(8)
+}
+
+// Java source and target compatibility for published artifacts
+java {
+    withJavadocJar()
+    withSourcesJar()
 }
 
 tasks.test {
@@ -63,11 +68,6 @@ configurations.all {
     }
 }
 
-// Java source and target compatibility for published artifacts
-java {
-    withJavadocJar()
-    withSourcesJar()
-}
 
 // Maven publishing configuration
 publishing {
@@ -76,7 +76,7 @@ publishing {
             from(components["java"])
             
             groupId = "io.github.ddsimoes"
-            artifactId = "autoswt"
+            artifactId = "autoswt-java8"
             version = "0.1.0"
             
             pom {
