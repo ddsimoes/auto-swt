@@ -10,17 +10,12 @@ repositories {
 }
 
 dependencies {
-    // Coroutines Swing dispatcher for SWT integration
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.10.2")
-    
     // SWT dependencies
     implementation("org.eclipse.platform:org.eclipse.swt:3.130.0")
     
     // Kotlin standard library
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
     
-    // Coroutines for async operations
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     
     // Optional: Reflection for advanced widget inspection
     implementation("org.jetbrains.kotlin:kotlin-reflect")
