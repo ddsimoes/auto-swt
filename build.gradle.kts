@@ -127,21 +127,21 @@ publishing {
 
 // Signing configuration for published artifacts
 signing {
+    setRequired({
+        // Only require signing if we have signing keys and we're publishing to a remote repository
+        gradle.taskGraph.hasTask("publish") && (
+            project.hasProperty("signing.keyId") || 
+            project.hasProperty("signingKey") || 
+            System.getenv("SIGNING_KEY") != null
+        )
+    })
+    
     val signingKey: String? by project
     val signingPassword: String? by project
-    useInMemoryPgpKeys(signingKey, signingPassword)
-    sign(publishing.publications["maven"])
-}
-
-// Only require signing for releases, not snapshots or local development
-gradle.taskGraph.whenReady {
-    if (gradle.taskGraph.allTasks.any { it is Sign }) {
-        val hasSigningKey = project.hasProperty("signing.keyId") || 
-                           project.hasProperty("signingKey") || 
-                           System.getenv("SIGNING_KEY") != null
-        if (!hasSigningKey) {
-            project.logger.warn("No signing key found. Skipping signing for development/snapshot builds.")
-            signing.setRequired(false)
-        }
+    
+    if (project.hasProperty("signingKey") || System.getenv("SIGNING_KEY") != null) {
+        useInMemoryPgpKeys(signingKey, signingPassword)
     }
+    
+    sign(publishing.publications["maven"])
 }
