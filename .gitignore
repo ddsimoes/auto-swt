@@ -1,7 +1,6 @@
 # Gradle
 .gradle/
 build/
-!gradle-wrapper.jar
 
 # IntelliJ IDEA
 .idea/
@@ -27,6 +26,7 @@ Thumbs.db
 # Kotlin
 *.class
 *.jar
+!gradle/wrapper/gradle-wrapper.jar
 
 # Test outputs
 *.log
