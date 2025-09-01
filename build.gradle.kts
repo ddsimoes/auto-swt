@@ -1,5 +1,7 @@
 plugins {
     id("org.jetbrains.kotlin.jvm") version "2.1.20"
+    `maven-publish`
+    signing
 }
 
 repositories {
@@ -62,6 +64,84 @@ configurations.all {
                         .using(module("org.eclipse.platform:org.eclipse.swt.cocoa.macosx.x86_64:3.108.0"))
                 }
             }
+        }
+    }
+}
+
+// Java source and target compatibility for published artifacts
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+// Maven publishing configuration
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+            
+            groupId = "io.github.ddsimoes"
+            artifactId = "autoswt"
+            version = "0.1.0"
+            
+            pom {
+                name.set("AutoSWT")
+                description.set("A lightweight, JUnit-integrated testing framework for SWT-based UIs with thread-safe test automation and comprehensive debugging tools")
+                url.set("https://github.com/ddsimoes/auto-swt")
+                
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+                
+                developers {
+                    developer {
+                        id.set("ddsimoes")
+                        name.set("Daniel Simoes")
+                        email.set("daniel@example.com")
+                    }
+                }
+                
+                scm {
+                    connection.set("scm:git:git://github.com/ddsimoes/auto-swt.git")
+                    developerConnection.set("scm:git:ssh://github.com/ddsimoes/auto-swt.git")
+                    url.set("https://github.com/ddsimoes/auto-swt")
+                }
+            }
+        }
+    }
+    
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/ddsimoes/auto-swt")
+            credentials {
+                username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
+            }
+        }
+    }
+}
+
+// Signing configuration for published artifacts
+signing {
+    val signingKey: String? by project
+    val signingPassword: String? by project
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    sign(publishing.publications["maven"])
+}
+
+// Only require signing for releases, not snapshots or local development
+gradle.taskGraph.whenReady {
+    if (gradle.taskGraph.allTasks.any { it is Sign }) {
+        val hasSigningKey = project.hasProperty("signing.keyId") || 
+                           project.hasProperty("signingKey") || 
+                           System.getenv("SIGNING_KEY") != null
+        if (!hasSigningKey) {
+            project.logger.warn("No signing key found. Skipping signing for development/snapshot builds.")
+            signing.setRequired(false)
         }
     }
 }
